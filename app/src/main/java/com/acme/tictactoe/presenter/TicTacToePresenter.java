@@ -1,13 +1,18 @@
 package com.acme.tictactoe.presenter;
 
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+
 import com.acme.tictactoe.model.Board;
 import com.acme.tictactoe.model.Player;
 import com.acme.tictactoe.view.TicTacToeView;
 
-public class TicTacToePresenter implements Presenter {
+public class TicTacToePresenter implements TicTacToePresenterInterface {
 
-    private TicTacToeView view;
+    private final TicTacToeView view;
     private Board model;
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     public TicTacToePresenter(TicTacToeView view) {
         this.view = view;
@@ -15,28 +20,18 @@ public class TicTacToePresenter implements Presenter {
     }
 
     @Override
-    public void onCreate() {
-        model = new Board();
-    }
-
-    @Override
-    public void onPause() {
-
-    }
-
-    @Override
-    public void onResume() {
-
-    }
-
-    @Override
-    public void onDestroy() {
-
-    }
-
     public void onButtonSelected(int row, int col) {
-        Player playerThatMoved = model.mark(row, col);
+        view.setProgressVisibility(true);
+        AsyncTask.SERIAL_EXECUTOR.execute(() -> mark(row, col));
+    }
 
+    private void mark(int row, int col) {
+        Player playerThatMoved = model.mark(row, col);
+        handler.post(() -> onCellMarked(row, col, playerThatMoved));
+    }
+
+    private void onCellMarked(int row, int col, Player playerThatMoved) {
+        view.setProgressVisibility(false);
         if(playerThatMoved != null) {
             view.setButtonText(row, col, playerThatMoved.toString());
 
@@ -46,6 +41,7 @@ public class TicTacToePresenter implements Presenter {
         }
     }
 
+    @Override
     public void onResetSelected() {
         view.clearWinnerDisplay();
         view.clearButtons();

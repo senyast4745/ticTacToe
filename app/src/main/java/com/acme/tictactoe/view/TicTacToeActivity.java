@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.acme.tictactoe.R;
 import com.acme.tictactoe.presenter.TicTacToePresenter;
+import com.acme.tictactoe.presenter.TicTacToePresenterInterface;
 
 public class TicTacToeActivity extends AppCompatActivity implements TicTacToeView {
 
@@ -21,35 +22,33 @@ public class TicTacToeActivity extends AppCompatActivity implements TicTacToeVie
     private ViewGroup buttonGrid;
     private View winnerPlayerViewGroup;
     private TextView winnerPlayerLabel;
+    private View progress;
 
-    TicTacToePresenter presenter = new TicTacToePresenter(this);
+    TicTacToePresenterInterface presenter = new TicTacToePresenter(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tictactoe);
-        winnerPlayerLabel = (TextView) findViewById(R.id.winnerPlayerLabel);
+        winnerPlayerLabel = findViewById(R.id.winnerPlayerLabel);
         winnerPlayerViewGroup = findViewById(R.id.winnerPlayerViewGroup);
-        buttonGrid = (ViewGroup) findViewById(R.id.buttonGrid);
-        presenter.onCreate();
+        buttonGrid = findViewById(R.id.buttonGrid);
+        progress = findViewById(R.id.progress);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        presenter.onPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        presenter.onResume();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        presenter.onDestroy();
     }
 
     @Override
@@ -83,10 +82,15 @@ public class TicTacToeActivity extends AppCompatActivity implements TicTacToeVie
 
     @Override
     public void setButtonText(int row, int col, String text) {
-        Button btn = (Button) buttonGrid.findViewWithTag("" + row + col);
+        Button btn = buttonGrid.findViewWithTag("" + row + col);
         if(btn != null) {
             btn.setText(text);
         }
+    }
+
+    @Override
+    public void setProgressVisibility(boolean visible) {
+        progress.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
     }
 
     public void clearButtons() {
