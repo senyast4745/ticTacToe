@@ -1,5 +1,7 @@
 package com.acme.tictactoe.controller;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +26,7 @@ public class TicTacToeActivity extends AppCompatActivity {
     private ViewGroup buttonGrid;
     private View winnerPlayerViewGroup;
     private TextView winnerPlayerLabel;
+    private View progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +35,7 @@ public class TicTacToeActivity extends AppCompatActivity {
         winnerPlayerLabel = (TextView) findViewById(R.id.winnerPlayerLabel);
         winnerPlayerViewGroup = findViewById(R.id.winnerPlayerViewGroup);
         buttonGrid = (ViewGroup) findViewById(R.id.buttonGrid);
-
+        progress = findViewById(R.id.progress);
         model = new Board();
     }
 
@@ -62,15 +65,21 @@ public class TicTacToeActivity extends AppCompatActivity {
         int col = Integer.valueOf(tag.substring(1,2));
         Log.i(TAG, "Click Row: [" + row + "," + col + "]");
 
-        Player playerThatMoved = model.mark(row, col);
+        progress.setVisibility(View.VISIBLE);
+        AsyncTask.SERIAL_EXECUTOR.execute(() -> {
+            Player playerThatMoved = model.mark(row, col);
+                button.post(() -> {
+                    progress.setVisibility(View.INVISIBLE);
 
-        if(playerThatMoved != null) {
-            button.setText(playerThatMoved.toString());
-            if (model.getWinner() != null) {
-                winnerPlayerLabel.setText(playerThatMoved.toString());
-                winnerPlayerViewGroup.setVisibility(View.VISIBLE);
-            }
-        }
+                    if(playerThatMoved != null) {
+                        button.setText(playerThatMoved.toString());
+                        if (model.getWinner() != null) {
+                            winnerPlayerLabel.setText(playerThatMoved.toString());
+                            winnerPlayerViewGroup.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+        });
 
     }
 

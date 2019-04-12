@@ -38,6 +38,10 @@ public class Board {
      *
      */
     public Player mark( int row, int col ) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ignored) {
+        }
 
         Player playerThatMoved = null;
 
