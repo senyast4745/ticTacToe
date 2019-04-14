@@ -1,52 +1,64 @@
 package com.acme.tictactoe.viewmodel;
 
-import android.databinding.ObservableArrayMap;
-import android.databinding.ObservableField;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
+import android.os.AsyncTask;
 
 import com.acme.tictactoe.model.Board;
 import com.acme.tictactoe.model.Player;
 
-public class TicTacToeViewModel implements ViewModel {
+import java.util.HashMap;
+import java.util.Map;
+
+public class TicTacToeViewModel extends ViewModel {
 
     private Board model;
 
-    public final ObservableArrayMap<String, String> cells = new ObservableArrayMap<>();
-    public final ObservableField<String> winner = new ObservableField<>();
+    private final MutableLiveData<Map<String, String>> cellsLiveData = new MutableLiveData<>();
+    private final MutableLiveData<String> winnerLiveData = new MutableLiveData<>();
+    private MutableLiveData<Boolean> progressVisibilityLiveData = new MutableLiveData<>();
+    private Map<String, String> cells = new HashMap<>();
 
     public TicTacToeViewModel() {
         model = new Board();
+        cellsLiveData.setValue(cells);
+        winnerLiveData.setValue("");
+        progressVisibilityLiveData.setValue(false);
     }
 
-    @Override
-    public void onCreate() {
-
+    public LiveData<Map<String, String>> getCellsLiveData() {
+        return cellsLiveData;
     }
 
-    @Override
-    public void onPause() {
-
+    public LiveData<String> getWinnerLiveData() {
+        return winnerLiveData;
     }
 
-    @Override
-    public void onResume() {
-
-    }
-
-    @Override
-    public void onDestroy() {
-
+    public LiveData<Boolean> getProgressVisibilityLiveData() {
+        return progressVisibilityLiveData;
     }
 
     public void onResetSelected() {
         model.restart();
-        winner.set(null);
-        cells.clear();
+        cells = new HashMap<>();
+        cellsLiveData.setValue(cells);
+        winnerLiveData.setValue("");
+        progressVisibilityLiveData.setValue(false);
     }
 
     public void onClickedCellAt(int row, int col) {
-        Player playerThatMoved = model.mark(row, col);
-        cells.put("" + row + col, playerThatMoved == null ? null : playerThatMoved.toString());
-        winner.set(model.getWinner() == null ? null : model.getWinner().toString());
+        progressVisibilityLiveData.setValue(true);
+        AsyncTask.SERIAL_EXECUTOR.execute(() -> {
+            Player playerThatMoved = model.mark(row, col);
+            progressVisibilityLiveData.postValue(false);
+            if (playerThatMoved != null) {
+                cells = new HashMap<>(cells);
+                cells.put(String.valueOf(row) + String.valueOf(col), playerThatMoved.toString());
+                cellsLiveData.postValue(cells);
+                winnerLiveData.postValue(model.getWinner() == null ? "" : model.getWinner().toString());
+            }
+        });
     }
 
 }
