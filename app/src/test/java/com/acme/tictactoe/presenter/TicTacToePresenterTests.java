@@ -1,6 +1,7 @@
 package com.acme.tictactoe.presenter;
 
 
+import com.acme.tictactoe.model.Board;
 import com.acme.tictactoe.view.TicTacToeView;
 
 import org.junit.Before;
@@ -8,6 +9,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.concurrent.Executor;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
@@ -23,10 +26,12 @@ public class TicTacToePresenterTests {
 
     @Mock
     private TicTacToeView view;
+    private Executor executor = Runnable::run;
 
     @Before
     public void setup() {
-        presenter = new TicTacToePresenter(view);
+        presenter = new TicTacToePresenter(executor, executor, new Board(executor));
+        presenter.setView(view);
     }
 
     private void clickAndAssertValueAt(int row, int col, String expectedValue) {

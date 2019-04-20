@@ -15,7 +15,7 @@ public class TicTacToeTests {
 
     @Before
     public void setup() {
-        board = new Board();
+        board = new Board(command -> { });
     }
 
     /**
