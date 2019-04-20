@@ -11,9 +11,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.acme.tictactoe.AndroidApplication;
 import com.acme.tictactoe.R;
-import com.acme.tictactoe.presenter.TicTacToePresenter;
 import com.acme.tictactoe.presenter.TicTacToePresenterInterface;
+
+import javax.inject.Inject;
 
 public class TicTacToeActivity extends AppCompatActivity implements TicTacToeView {
 
@@ -24,16 +26,19 @@ public class TicTacToeActivity extends AppCompatActivity implements TicTacToeVie
     private TextView winnerPlayerLabel;
     private View progress;
 
-    TicTacToePresenterInterface presenter = new TicTacToePresenter(this);
+    @Inject
+    TicTacToePresenterInterface presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ((AndroidApplication) getApplication()).getAppComponent().inject(this);
         setContentView(R.layout.tictactoe);
         winnerPlayerLabel = findViewById(R.id.winnerPlayerLabel);
         winnerPlayerViewGroup = findViewById(R.id.winnerPlayerViewGroup);
         buttonGrid = findViewById(R.id.buttonGrid);
         progress = findViewById(R.id.progress);
+        presenter.setView(this);
     }
 
     @Override

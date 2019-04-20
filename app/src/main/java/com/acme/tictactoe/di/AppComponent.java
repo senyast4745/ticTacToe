@@ -1,0 +1,13 @@
+package com.acme.tictactoe.di;
+
+import com.acme.tictactoe.view.TicTacToeActivity;
+
+import javax.inject.Singleton;
+
+import dagger.Component;
+
+@Singleton
+@Component(modules = { AppModule.class })
+public interface AppComponent {
+    void inject(TicTacToeActivity ticTacToeActivity);
+}

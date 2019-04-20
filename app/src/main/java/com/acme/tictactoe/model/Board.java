@@ -1,5 +1,10 @@
 package com.acme.tictactoe.model;
 
+import java.util.concurrent.Executor;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import static com.acme.tictactoe.model.Player.O;
 import static com.acme.tictactoe.model.Player.X;
 
@@ -10,10 +15,13 @@ public class Board {
     private Player winner;
     private GameState state;
     private Player currentTurn;
+    private Executor executor; //just an example of injection
 
     private enum GameState { IN_PROGRESS, FINISHED };
 
-    public Board() {
+    @Inject
+    public Board(@Named("MainThreadExecutor") Executor executor) {
+        this.executor = executor;
         restart();
     }
 
